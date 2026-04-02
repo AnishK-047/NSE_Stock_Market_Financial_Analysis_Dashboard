@@ -181,3 +181,63 @@ LEFT JOIN index_data i
     
 ----------------------------------------------------------------------------------------------------------------------
 
+-- 1. Which Nifty 50 stocks consistently outperform the index across multiple time periods?
+
+select Stock, avg(Alpha) as Avg_Alpha
+from stock_hist
+where Alpha is not null
+group by Stock
+order by Avg_Alpha desc;
+
+-----------------------------------------------------------------------------------------------------------------------
+
+-- 2. Is there a relationship between stock returns and volatility among Nifty 50 stocks?
+
+select Stock ,
+avg(Stock_return) as Avg_Return, 
+avg(volatility) as Avg_Volatility 
+from stock_hist
+where Volatility is not null
+group by Stock
+order by Avg_Return desc;
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- 3. Which sectors contribute the most to overall Nifty 50 returns, and how does this change over time?
+
+select Sector,Avg(Stock_return) as Avg_Return
+from stock_hist
+where Stock_return is not null
+group by Sector
+order by Avg_Return desc;
+
+----------------------------------------------------------------------------------------------------------------------------
+
+-- 4. Do high P/E ratio stocks outperform low P/E stocks in the long term?
+
+select case
+		when f.PE_Ratio > (select avg(PE_Ratio) from fundamental_data )
+        Then "High"
+        Else "Low"
+        End as PE_Category,
+        avg(s.Stock_return) as Avg_Return
+        from stock_hist as s
+        join fundamental_data as f on s.Stock = f.Stock
+        group by PE_Category;
+        
+        
+----------------------------------------------------------------------------------------------------------------------
+
+-- 5. Do companies with strong fundamentals (high ROE, low debt) generate better stock returns?
+
+select s.Stock, avg(f.ROE) as Avg_ROE, 
+avg(f.Debt_to_Equity) as Avg_Debt,
+avg(s.Stock_return) as Avg_Return
+from stock_hist as s
+join fundamental_data as f on s.Stock = f.Stock
+group by s.Stock
+order by Avg_Return desc;
+
+-----------------------------------------------------------------------------------------------------------------------
+
+-- 6. Can moving averages and rising volatility act as early indicators of stock price corrections?
