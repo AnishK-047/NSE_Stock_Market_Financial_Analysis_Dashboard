@@ -241,3 +241,35 @@ order by Avg_Return desc;
 -----------------------------------------------------------------------------------------------------------------------
 
 -- 6. Can moving averages and rising volatility act as early indicators of stock price corrections?
+
+select Stock,Date,MA50,MA200,Volatility,
+case 
+when MA50 < MA200 and Volatility > 0.02 then 'Correction Signal'
+else 'Normal' 
+End as signals
+from stock_hist
+where MA50 is not null and MA200 is not null;
+
+---------------------------------------------------------------------------------------------------------------------------
+
+-- 7. Which sectors provide the best risk-adjusted returns within the Nifty 50?
+
+select Sector, Avg(Sharpe) as Avg_Sharpe 
+from stock_hist
+where sharpe is not null
+group by Sector
+order by Avg_Sharpe desc;
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+-- 8. Which stocks or sectors have low correlation and help in reducing portfolio risk?
+
+select Stock, Avg(Stock_return) as Avg_Return,
+STDDEV(Stock_return) as Risk
+from Stock_hist
+group by Stock;
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- 9. Which stocks show a mismatch between price growth and fundamental performance (overvalued or undervalued)?
+
