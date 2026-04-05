@@ -273,3 +273,24 @@ group by Stock;
 
 -- 9. Which stocks show a mismatch between price growth and fundamental performance (overvalued or undervalued)?
 
+select s.Stock, 
+Avg(f.PE_Ratio) as Avg_PE,
+Avg(f.ROE) as Avg_ROE,
+Avg(s.Return_1y) as Return_1yr,
+(Avg(s.Return_1y) - Avg(f.ROE)) as Valuation_gap 
+from stock_hist s
+join fundamental_data f on s.Stock = f.Stock
+where s.Return_1y is not null
+group by s.Stock 
+order by valuation_gap Desc;
+
+--------------------------------------------------------------------------------------------------------------------------
+
+-- 10. Which sectors and stocks are most resilient during market downturns?
+
+select Stock,
+Avg(Stock_return) as Avg_Return_During_MarketCrash
+from stock_hist
+where Market_crash = TRUE
+group by Stock
+order by Avg_Return_During_MarketCrash Desc;
